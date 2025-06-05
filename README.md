@@ -1,28 +1,30 @@
 # Georgian Language Learning App
-  
-This is a project built with [Chef](https://chef.convex.dev) using [Convex](https://convex.dev) as its backend.
-  
-This project is connected to the Convex deployment named [`healthy-hound-444`](https://dashboard.convex.dev/d/healthy-hound-444).
-  
-## Project structure
-  
-The frontend code is in the `app` directory and is built with [Vite](https://vitejs.dev/).
-  
-The backend code is in the `convex` directory.
-  
-`npm run dev` will start the frontend and backend servers.
 
-## App authentication
+A modern, interactive web application for learning the Georgian language. This app helps users master the Georgian alphabet, vocabulary, phrases, and grammar through various interactive lesson types.
 
-Chef apps use [Convex Auth](https://auth.convex.dev/) with Anonymous auth for easy sign in. You may wish to change this before deploying your app.
+## Features
 
-## Developing and deploying your app
+- **Multiple Learning Modes**:
+  - 📝 **Alphabet & Reading**: Learn the Georgian alphabet with pronunciation guides and interactive spelling challenges
+  - 🃏 **Flashcards**: Practice vocabulary with interactive flashcards for quick memorization
+  - 💬 **Travel Phrases**: Master essential phrases for traveling in Georgia
+  - 📚 **Grammar**: Understand Georgian grammar rules and sentence structure
 
-Check out the [Convex docs](https://docs.convex.dev/) for more information on how to develop with Convex.
-* If you're new to Convex, the [Overview](https://docs.convex.dev/understanding/) is a good place to start
-* Check out the [Hosting and Deployment](https://docs.convex.dev/production/) docs for how to deploy your app
-* Read the [Best Practices](https://docs.convex.dev/understanding/best-practices/) guide for tips on how to improve you app further
+- **Progress Tracking**: The app tracks your progress across all lessons, allowing you to see your completion status and scores
+- **Interactive Lessons**: Various lesson types including alphabet learning, spelling bee challenges, phrase practice, and grammar exercises
+- **Offline Capability**: Progress is saved in your browser's local storage, so you can continue learning without an internet connection
 
-## HTTP API
+## Technology Stack
 
-User-defined http routes are defined in the `convex/router.ts` file. We split these routes into a separate file from `convex/http.ts` to allow us to prevent the LLM from modifying the authentication routes.
+- **Frontend**: React 19 with TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React hooks for local state management
+- **Storage**: Browser LocalStorage for saving user progress
+- **Build Tool**: Vite
+
+## Project Structure
+
+- `src/components/`: React components for different parts of the application
+- `src/data/lessons/`: Georgian language lesson content organized by type
+- `src/utils/`: Utility functions including local storage management
+- `src/lib/`: Helper libraries and functions
