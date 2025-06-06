@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { UserProgress } from "../utils/localStorageUtils";
 import { Lesson } from "../data/lessons";
 
@@ -14,6 +14,13 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [quizResults, setQuizResults] = useState<Array<{
+    question: string;
+    phonetic: string;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+  }>>([]);
   const [fabOpen, setFabOpen] = useState(false);
   const [showKeyboardHint, setShowKeyboardHint] = useState(() => {
     // Check localStorage to see if user has dismissed the hint
@@ -71,9 +78,16 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
     localStorage.setItem('keyboardHintDismissed', 'true');
   };
 
-  const completeQuiz = (quizScore: number) => {
+  const completeQuiz = (quizScore: number, results: Array<{
+    question: string;
+    phonetic: string;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+  }>) => {
     setQuizCompleted(true);
     setScore(quizScore);
+    setQuizResults(results);
     
     // Update progress
     updateProgress({
@@ -157,17 +171,7 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
                 </button>
               </div>
               
-              {/* Progress Indicator */}
-              <div className="flex gap-1 mb-6">
-                {phrases.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full ${
-                      index === currentIndex ? "bg-indigo-600" : "bg-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
+              {/* Progress Indicator has been removed as requested */}
             </div>
           )}
 
@@ -234,21 +238,62 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
       )}
 
       {quizCompleted && (
-        <div className="text-center">
-          <div className="text-4xl mb-4">🎉</div>
-          <h3 className="text-xl font-bold mb-2">Quiz Completed!</h3>
-          <p className="text-gray-600 mb-4">
-            Your score: {score}%
-          </p>
-          <button
-            onClick={() => {
-              setQuizStarted(false);
-              setQuizCompleted(false);
-            }}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-          >
-            Review Phrases
-          </button>
+        <div className="space-y-6">
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-4">🎉</div>
+            <h3 className="text-xl font-bold mb-2">Quiz Completed!</h3>
+            <p className="text-gray-600 mb-4">
+              Your score: {score}%
+            </p>
+          </div>
+          
+          {/* Detailed Results Report */}
+          <div className="border rounded-lg overflow-hidden">
+            <h4 className="bg-gray-50 p-4 font-medium border-b">Detailed Results</h4>
+            <div className="divide-y">
+              {quizResults.map((result, index) => (
+                <div key={index} className={`p-4 ${result.isCorrect ? 'bg-green-50' : 'bg-red-50'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium">{result.question}</p>
+                      <p className="text-sm text-gray-600">{result.phonetic}</p>
+                    </div>
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      result.isCorrect 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {result.isCorrect ? 'Correct' : 'Incorrect'}
+                    </div>
+                  </div>
+                  <div className="text-sm">
+                    <p>
+                      <span className="font-medium">Correct answer:</span>{' '}
+                      <span className="text-green-700">{result.correctAnswer}</span>
+                    </p>
+                    {!result.isCorrect && (
+                      <p>
+                        <span className="font-medium">Your answer:</span>{' '}
+                        <span className="text-red-700">{result.userAnswer}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => {
+                setQuizStarted(false);
+                setQuizCompleted(false);
+              }}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Review Phrases
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -260,26 +305,81 @@ function PhrasesQuiz({
   onComplete 
 }: { 
   phrases: Array<{ georgian: string; phonetic: string; english: string }>; 
-  onComplete: (score: number) => void;
+  onComplete: (score: number, results: Array<{
+    question: string;
+    phonetic: string;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+  }>) => void;
 }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<boolean[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [results, setResults] = useState<Array<{
+    question: string;
+    phonetic: string;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+  }>>([]);
   
-  const handleAnswer = (correct: boolean) => {
-    const newAnswers = [...answers, correct];
-    setAnswers(newAnswers);
+  // Pre-generate all quiz options once to avoid shuffling on re-renders
+  const quizOptions = useMemo(() => {
+    return phrases.map((phrase, index) => {
+      // Get the correct answer
+      const correctAnswer = phrase.english;
+      
+      // Get 3 random incorrect answers
+      const incorrectAnswers = phrases
+        .filter((p, i) => i !== index)
+        .map(p => p.english)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+      
+      // Combine and shuffle all options
+      return [...incorrectAnswers, correctAnswer]
+        .sort(() => 0.5 - Math.random());
+    });
+  }, [phrases]);
+  
+  const handleOptionSelect = (option: string) => {
+    if (isAnswered) return; // Prevent changing answer after submission
     
-    if (currentQuestion < phrases.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      // Calculate score
-      const correctAnswers = newAnswers.filter(a => a).length;
-      const scorePercentage = Math.round((correctAnswers / phrases.length) * 100);
-      onComplete(scorePercentage);
-    }
+    setSelectedOption(option);
+    setIsAnswered(true);
+    
+    const isCorrect = option === phrases[currentQuestion].english;
+    
+    // Record the result
+    const newResults = [...results, {
+      question: phrases[currentQuestion].georgian,
+      phonetic: phrases[currentQuestion].phonetic,
+      correctAnswer: phrases[currentQuestion].english,
+      userAnswer: option,
+      isCorrect
+    }];
+    
+    setResults(newResults);
+    
+    // Move to next question after a delay
+    setTimeout(() => {
+      if (currentQuestion < phrases.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedOption(null);
+        setIsAnswered(false);
+      } else {
+        // Quiz completed
+        const correctAnswers = newResults.filter(r => r.isCorrect).length;
+        const scorePercentage = Math.round((correctAnswers / phrases.length) * 100);
+        onComplete(scorePercentage, newResults);
+      }
+    }, 1500); // 1.5 second delay to show feedback
   };
   
-  // Simple quiz implementation - you would want to make this more robust
+  // Get current question's options
+  const currentOptions = quizOptions[currentQuestion];
+  
   return (
     <div className="space-y-6">
       <div className="p-6 border rounded-lg bg-gray-50">
@@ -291,22 +391,49 @@ function PhrasesQuiz({
         </div>
         
         <div className="space-y-3">
-          {/* Generate some options including the correct one */}
-          {[phrases[currentQuestion].english, 
-            ...phrases.filter((_, i) => i !== currentQuestion)
-              .map(p => p.english)
-              .sort(() => 0.5 - Math.random())
-              .slice(0, 3)]
-            .sort(() => 0.5 - Math.random())
-            .map((option, index) => (
+          {currentOptions.map((option, index) => {
+            const isCorrect = option === phrases[currentQuestion].english;
+            const isSelected = selectedOption === option;
+            
+            // Determine button styling based on state
+            let buttonClass = "w-full p-3 text-left border rounded-md";
+            
+            if (isAnswered) {
+              if (isCorrect) {
+                // Correct answer - always show green
+                buttonClass += " border-green-500 bg-green-50 text-green-800";
+              } else if (isSelected) {
+                // Selected but incorrect
+                buttonClass += " border-red-500 bg-red-50 text-red-800";
+              }
+            } else {
+              // Not answered yet
+              buttonClass += " hover:bg-gray-100";
+            }
+            
+            return (
               <button
                 key={index}
-                onClick={() => handleAnswer(option === phrases[currentQuestion].english)}
-                className="w-full p-3 text-left border rounded-md hover:bg-gray-100"
+                onClick={() => handleOptionSelect(option)}
+                disabled={isAnswered}
+                className={buttonClass}
               >
-                {option}
+                <div className="flex justify-between items-center">
+                  <span>{option}</span>
+                  {isAnswered && isCorrect && (
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  {isAnswered && isSelected && !isCorrect && (
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
               </button>
-            ))}
+            );
+          })}
         </div>
       </div>
     </div>
