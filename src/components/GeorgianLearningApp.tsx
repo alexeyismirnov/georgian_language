@@ -60,7 +60,8 @@ export function GeorgianLearningApp() {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center justify-center">
+          <span className="mr-2">🇬🇪</span>
           Georgian Language Learning
         </h1>
         <p className="text-gray-600">
@@ -96,7 +97,7 @@ export function GeorgianLearningApp() {
               {config.icon} {config.label}
             </button>
           ))}
-    </div>
+        </div>
       </div>
 
       {/* Content Area */}
@@ -193,12 +194,12 @@ export function GeorgianLearningApp() {
                       )}
                     </div>
                   </div>
-  );
+                );
               })}
             </div>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

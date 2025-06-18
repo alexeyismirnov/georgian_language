@@ -242,9 +242,6 @@ export function AlphabetLesson({ lesson, progress, updateProgress }: AlphabetLes
                 {/* Back of card */}
                 <div className="flashcard-face back">
                   <div className="text-2xl mb-2">{currentItem.english}</div>
-                  <div className="text-gray-600 text-center">
-                    {currentItem.phonetic} - {currentItem.georgian}
-                  </div>
                   <div className="absolute bottom-2 text-xs text-gray-400">
                     Click to flip back
                   </div>
@@ -335,7 +332,7 @@ export function AlphabetLesson({ lesson, progress, updateProgress }: AlphabetLes
         </button>
       </div>
       
-      <style jsx>{`
+      <style>{`
         .flashcard-container {
           perspective: 1000px;
         }
