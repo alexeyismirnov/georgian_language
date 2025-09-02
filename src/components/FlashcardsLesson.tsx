@@ -222,8 +222,8 @@ export function FlashcardsLesson({ lesson, progress, updateProgress }: Flashcard
         </div>
       ) : (
         <>
-          <div className="flex justify-center mb-8">
-            <div className="flashcard-container w-full max-w-md h-64">
+          <div className="flex flex-col items-center">
+            <div className="flashcard-container w-full max-w-md h-64 mb-8">
               <div 
                 className={`flashcard ${flipped ? 'flipped' : ''}`}
                 onClick={handleFlip}
@@ -254,136 +254,96 @@ export function FlashcardsLesson({ lesson, progress, updateProgress }: Flashcard
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="flex justify-center mb-8">
-            <div className="w-full max-w-md flex justify-between items-center">
-              {/* Navigation Controls - Left Side */}
-              <div className="flex gap-4">
-                <button
-                  onClick={handlePrevious}
-                  disabled={currentIndex === 0}
-                  className="p-3 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  title="Previous card"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <div className="flex items-center px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
-                  {currentIndex + 1} of {cards.length}
-                </div>
-                <button
-                  onClick={handleNext}
-                  disabled={currentIndex === cards.length - 1}
-                  className="p-3 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  title="Next card"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* FAB - Right Side */}
-              <div className="relative">
-                {/* FAB Menu Items */}
-                {fabOpen && (
-                  <div className="absolute bottom-16 right-0 space-y-2 animate-in slide-in-from-bottom-2 duration-200">
-                    <button
-                      onClick={() => {
-                        setShowAll(!showAll);
-                        setFabOpen(false);
-                      }}
-                      className="flex items-center gap-3 px-4 py-3 bg-white border rounded-full shadow-lg hover:shadow-xl transition-shadow text-sm whitespace-nowrap"
-                    >
-                      {showAll ? (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                          </svg>
-                          Show One by One
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                          </svg>
-                          Show All Cards
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={startQuiz}
-                      className="flex items-center gap-3 px-4 py-3 bg-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow text-sm whitespace-nowrap"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Start Quiz
-                    </button>
-                  </div>
-                )}
 
-                {/* Main FAB Button */}
-                <button
-                  onClick={() => setFabOpen(!fabOpen)}
-                  className={`w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center ${
-                    fabOpen ? 'bg-gray-600 rotate-45' : 'bg-indigo-600'
-                  } text-white`}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
+            <div className="flex justify-center mb-8">
+              <div className="w-full max-w-md flex justify-between items-center">
+                {/* Navigation Controls - Left Side */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={handlePrevious}
+                    disabled={currentIndex === 0}
+                    className="p-3 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    title="Previous card"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <div className="flex items-center px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
+                    {currentIndex + 1} of {cards.length}
+                  </div>
+                  <button
+                    onClick={handleNext}
+                    disabled={currentIndex === cards.length - 1}
+                    className="p-3 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    title="Next card"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="w-8"></div>
+                
+                {/* FAB - Right Side */}
+                <div className="relative">
+                  {/* FAB Menu Items */}
+                  {fabOpen && (
+                    <div className="absolute bottom-16 right-0 space-y-2 animate-in slide-in-from-bottom-2 duration-200">
+                      <button
+                        onClick={() => {
+                          setShowAll(!showAll);
+                          setFabOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 bg-white border rounded-full shadow-lg hover:shadow-xl transition-shadow text-sm whitespace-nowrap"
+                      >
+                        {showAll ? (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            Show One by One
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            Show All Cards
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={startQuiz}
+                        className="flex items-center gap-3 px-4 py-3 bg-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow text-sm whitespace-nowrap"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Start Quiz
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Main FAB Button */}
+                  <button
+                    onClick={() => setFabOpen(!fabOpen)}
+                    className={`w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center ${
+                      fabOpen ? 'bg-gray-600 rotate-45' : 'bg-indigo-600'
+                    } text-white`}
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
         </>
       )}
-      
-      
-      <style jsx>{`
-        .flashcard-container {
-          perspective: 1000px;
-        }
-        
-        .flashcard {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          cursor: pointer;
-          transform-style: preserve-3d;
-          transition: transform 0.6s;
-        }
-        
-        .flashcard.flipped {
-          transform: rotateY(180deg);
-        }
-        
-        .flashcard-face {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 1.5rem;
-          border-radius: 0.5rem;
-          border: 1px solid #e5e7eb;
-          backface-visibility: hidden;
-        }
-        
-        .front {
-          background-color: white;
-        }
-        
-        .back {
-          background-color: #eef2ff;
-          transform: rotateY(180deg);
-        }
-      `}</style>
     </div>
   );
 }

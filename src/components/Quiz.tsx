@@ -94,7 +94,6 @@ export function Quiz({
         <p className="mb-2">{questionLabel}</p>
         <div className="p-4 bg-white rounded border mb-6">
           <div className="text-lg mb-1">{items[currentQuestion].georgian}</div>
-          <div className="text-sm text-gray-600">{items[currentQuestion].phonetic}</div>
         </div>
         
         <div className="space-y-3">

@@ -11,6 +11,7 @@ interface PhrasesLessonProps {
 
 export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLessonProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
@@ -23,11 +24,6 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
     isCorrect: boolean;
   }>>([]);
   const [fabOpen, setFabOpen] = useState(false);
-  const [showKeyboardHint, setShowKeyboardHint] = useState(() => {
-    // Check localStorage to see if user has dismissed the hint
-    const dismissed = localStorage.getItem('keyboardHintDismissed');
-    return dismissed !== 'true';
-  });
 
   const phrases = lesson.content.items;
   const currentPhrase = phrases[currentIndex];
@@ -45,7 +41,7 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
         handleNext();
       } else if (e.key === ' ') {
         e.preventDefault();
-        setShowAll(!showAll);
+        setFlipped(!flipped);
       } else if (e.key === 'Enter') {
         e.preventDefault();
         startQuiz();
@@ -57,12 +53,14 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
   }, [currentIndex, phrases.length, quizStarted, quizCompleted, showAll]);
 
   const handleNext = () => {
+    setFlipped(false);
     if (currentIndex < phrases.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handlePrevious = () => {
+    setFlipped(false);
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
@@ -74,10 +72,6 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
     setFabOpen(false);
   };
 
-  const dismissKeyboardHint = () => {
-    setShowKeyboardHint(false);
-    localStorage.setItem('keyboardHintDismissed', 'true');
-  };
 
   const completeQuiz = (quizScore: number, results: Array<{
     question: string;
@@ -104,23 +98,6 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
       <h2 className="text-2xl font-bold mb-4">{lesson.title}</h2>
       <p className="text-gray-600 mb-6">{lesson.content.description}</p>
 
-      {/* Keyboard shortcuts hint */}
-      {!quizStarted && !quizCompleted && !showAll && showKeyboardHint && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg relative">
-          <button
-            onClick={dismissKeyboardHint}
-            className="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition-colors"
-            title="Dismiss hint"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <p className="text-sm text-blue-700 pr-6">
-            💡 <strong>Keyboard shortcuts:</strong> Use ← → arrow keys to navigate, Space to toggle view, Enter to start quiz
-          </p>
-        </div>
-      )}
 
       {!quizStarted && !quizCompleted && (
         <div className="space-y-6">
@@ -139,11 +116,32 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
             </div>
           ) : (
             <div className="flex flex-col items-center">
-              <div className="text-xl mb-6 p-4 bg-gray-50 rounded-lg border w-full text-center">
-                {currentPhrase.georgian}
+              <div className="flashcard-container w-full max-w-md h-64 mb-8">
+                <div
+                  className={`flashcard ${flipped ? 'flipped' : ''}`}
+                  onClick={() => setFlipped(!flipped)}
+                >
+                  {/* Front of card */}
+                  <div className="flashcard-face front">
+                    <div className="text-4xl mb-4">{currentPhrase.georgian}</div>
+                    <div className="text-gray-600">{currentPhrase.phonetic}</div>
+                    <div className="absolute bottom-2 text-xs text-gray-400">
+                      Click to flip
+                    </div>
+                  </div>
+                  
+                  {/* Back of card */}
+                  <div className="flashcard-face back">
+                    <div className="text-2xl mb-2">{currentPhrase.english}</div>
+                    <div className="text-gray-600 text-center">
+                      {currentPhrase.phonetic} - {currentPhrase.georgian}
+                    </div>
+                    <div className="absolute bottom-2 text-xs text-gray-400">
+                      Click to flip back
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-lg mb-2 font-medium">{currentPhrase.phonetic}</div>
-              <div className="text-gray-600 mb-6">{currentPhrase.english}</div>
               
               <div className="flex justify-center mb-8">
                 <div className="w-full max-w-md flex justify-between items-center">
@@ -305,5 +303,6 @@ export function PhrasesLesson({ lesson, progress, updateProgress }: PhrasesLesso
     </div>
   );
 }
+
 
 export default PhrasesLesson;
